@@ -341,10 +341,22 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                                 maxHeight: _maxHeight,
                                 minHeight: _minOpenedHeight),
                             child: widget.panel != null
-                                ? ListView(
-                                  controller: _sc,
-                                  children: <Widget>[widget.panel])
+                                ? CustomScrollView(controller: _sc, slivers: [
+                                    SliverPersistentHeader(
+                                      pinned: true,
+                                      floating: false,
+                                      delegate: TopBarSliverHeader(width: (MediaQuery.of(context).size.width * 0.2).round().toDouble()),
+                                    ),
+                                    SliverList(
+                                        delegate: SliverChildListDelegate(
+                                            [widget.panel]))
+                                  ])
                                 : widget.panelBuilder(_sc),
+                            // child: widget.panel != null
+                            //     ? ListView(
+                            //         controller: _sc,
+                            //         children: <Widget>[widget.panel])
+                            //     : widget.panelBuilder(_sc),
                           )),
 
                       // collapsed panel
@@ -655,5 +667,37 @@ class PanelController {
   bool get isPanelShown {
     assert(isAttached, "PanelController must be attached to a SlidingUpPanel");
     return _panelState._isPanelShown;
+  }
+}
+
+class TopBarSliverHeader extends SliverPersistentHeaderDelegate {
+  final double width;
+
+  @override
+  double get minExtent => 30;
+
+  @override
+  double get maxExtent => 30;
+
+  TopBarSliverHeader({@required this.width});
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Column(children: [
+      Padding(padding: EdgeInsets.only(top: 10)),
+      Container(
+        width: width,
+        height: 6,
+        decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      ),
+      Padding(padding: EdgeInsets.only(top: 14)),
+    ]);
+  }
+
+  bool shouldRebuild(TopBarSliverHeader oldDelegate) {
+    return false;
   }
 }
