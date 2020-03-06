@@ -345,7 +345,15 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                                     SliverPersistentHeader(
                                       pinned: true,
                                       floating: false,
-                                      delegate: TopBarSliverHeader(width: (MediaQuery.of(context).size.width * 0.2).round().toDouble()),
+                                      delegate: TopBarSliverHeader(
+                                          width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2)
+                                              .round()
+                                              .toDouble(),
+                                          backgroundColor: widget.color,
+                                          boarderRadius: widget.borderRadius),
                                     ),
                                     SliverList(
                                         delegate: SliverChildListDelegate(
@@ -671,7 +679,9 @@ class PanelController {
 }
 
 class TopBarSliverHeader extends SliverPersistentHeaderDelegate {
+  final Color backgroundColor;
   final double width;
+  final BorderRadiusGeometry boarderRadius;
 
   @override
   double get minExtent => 30;
@@ -679,21 +689,23 @@ class TopBarSliverHeader extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent => 30;
 
-  TopBarSliverHeader({@required this.width});
+  TopBarSliverHeader({@required this.width, @required this.backgroundColor, @required this.boarderRadius});
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Column(children: [
-      Padding(padding: EdgeInsets.only(top: 10)),
-      Container(
+    return Stack(children: [
+      Container(height: 30, decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: boarderRadius)),
+      Center(
+          child: Container(
         width: width,
         height: 6,
         decoration: BoxDecoration(
             color: Colors.grey[300],
             borderRadius: BorderRadius.all(Radius.circular(12.0))),
-      ),
-      Padding(padding: EdgeInsets.only(top: 14)),
+      )),
     ]);
   }
 
