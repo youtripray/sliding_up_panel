@@ -264,6 +264,22 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
         widget.maxHeight > tempMaxHeight ? tempMaxHeight : widget.maxHeight;
     _maxHeight = _maxHeight > _minOpenedHeight ? _maxHeight : _minOpenedHeight;
 
+    /// Prepare slivers for CustomScrollView
+    var _slivers = <Widget>[];
+
+    /// Hide SliverPersistentHeader UI if not draggable
+    if (widget.isDraggable) {
+      _slivers.add(SliverPersistentHeader(
+        pinned: true,
+        floating: false,
+        delegate: TopBarSliverHeader(
+            width: (MediaQuery.of(context).size.width * 0.2).round().toDouble(),
+            backgroundColor: widget.color,
+            boarderRadius: widget.borderRadius),
+      ));
+    }
+    _slivers.add(SliverList(delegate: SliverChildListDelegate([widget.panel])));
+
     return Stack(
       alignment: widget.slideDirection == SlideDirection.UP
           ? Alignment.bottomCenter
@@ -341,24 +357,8 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                                 maxHeight: _maxHeight,
                                 minHeight: _minOpenedHeight),
                             child: widget.panel != null
-                                ? CustomScrollView(controller: _sc, slivers: [
-                                    SliverPersistentHeader(
-                                      pinned: true,
-                                      floating: false,
-                                      delegate: TopBarSliverHeader(
-                                          width: (MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.2)
-                                              .round()
-                                              .toDouble(),
-                                          backgroundColor: widget.color,
-                                          boarderRadius: widget.borderRadius),
-                                    ),
-                                    SliverList(
-                                        delegate: SliverChildListDelegate(
-                                            [widget.panel]))
-                                  ])
+                                ? CustomScrollView(
+                                    controller: _sc, slivers: _slivers)
                                 : widget.panelBuilder(_sc),
                             // child: widget.panel != null
                             //     ? ListView(
