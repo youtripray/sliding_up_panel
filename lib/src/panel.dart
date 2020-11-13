@@ -354,17 +354,13 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                                   : 0),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
-                                maxHeight: _maxHeight,
+                                maxHeight: _maxHeight -
+                                    MediaQuery.of(context).viewPadding.bottom,
                                 minHeight: _minOpenedHeight),
                             child: widget.panel != null
                                 ? CustomScrollView(
                                     controller: _sc, slivers: _slivers)
                                 : widget.panelBuilder(_sc),
-                            // child: widget.panel != null
-                            //     ? ListView(
-                            //         controller: _sc,
-                            //         children: <Widget>[widget.panel])
-                            //     : widget.panelBuilder(_sc),
                           )),
 
                       // collapsed panel
