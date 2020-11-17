@@ -142,6 +142,9 @@ class SlidingUpPanel extends StatefulWidget {
   /// e.g. minOpenedHeightRatio = 0.33 means the panel will take up at least 1/3 of the screen when opened
   final double minOpenedHeightRatio;
 
+  /// Do NOT display on top/bottom safe area if true
+  final bool avoidSafeArea;
+
   SlidingUpPanel({
     Key key,
     this.panel,
@@ -177,6 +180,7 @@ class SlidingUpPanel extends StatefulWidget {
     this.isDraggable = true,
     this.slideDirection = SlideDirection.UP,
     this.defaultPanelState = PanelState.CLOSED,
+    this.avoidSafeArea = false,
   })  : assert(panel != null || panelBuilder != null),
         assert(0 <= backdropOpacity && backdropOpacity <= 1.0),
         super(key: key);
@@ -263,6 +267,17 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
     double _maxHeight =
         widget.maxHeight > tempMaxHeight ? tempMaxHeight : widget.maxHeight;
     _maxHeight = _maxHeight > _minOpenedHeight ? _maxHeight : _minOpenedHeight;
+
+    double _viewportHeight = _maxHeight;
+    if (widget.avoidSafeArea) {
+      _viewportHeight = _viewportHeight -
+          (widget.slideDirection == SlideDirection.UP
+              ? MediaQuery.of(context).viewPadding.bottom
+              : MediaQuery.of(context).viewPadding.top);
+      _viewportHeight = _viewportHeight > _minOpenedHeight
+          ? _viewportHeight
+          : _minOpenedHeight;
+    }
 
     /// Prepare slivers for CustomScrollView
     var _slivers = <Widget>[];
@@ -354,8 +369,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                                   : 0),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
-                                maxHeight: _maxHeight -
-                                    MediaQuery.of(context).viewPadding.bottom,
+                                maxHeight: _viewportHeight,
                                 minHeight: _minOpenedHeight),
                             child: widget.panel != null
                                 ? CustomScrollView(
@@ -685,15 +699,19 @@ class TopBarSliverHeader extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent => 30;
 
-  TopBarSliverHeader({@required this.width, @required this.backgroundColor, @required this.boarderRadius});
+  TopBarSliverHeader(
+      {@required this.width,
+      @required this.backgroundColor,
+      @required this.boarderRadius});
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Stack(children: [
-      Container(height: 30, decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: boarderRadius)),
+      Container(
+          height: 30,
+          decoration: BoxDecoration(
+              color: backgroundColor, borderRadius: boarderRadius)),
       Center(
           child: Container(
         width: width,
