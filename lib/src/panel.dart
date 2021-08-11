@@ -263,7 +263,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
     }
 
     double tempMaxHeight =
-        (MediaQuery.of(context).size.height * 2 / 3).round().toDouble();
+        (MediaQuery.of(context).size.height * 9 / 10).round().toDouble();
     double _maxHeight =
         widget.maxHeight > tempMaxHeight ? tempMaxHeight : widget.maxHeight;
     _maxHeight = _maxHeight > _minOpenedHeight ? _maxHeight : _minOpenedHeight;
